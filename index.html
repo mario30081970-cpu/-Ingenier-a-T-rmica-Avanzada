@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Examen: Ingeniería Térmica Avanzada</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #fce4ec 0%, #fff3e0 50%, #e0f2f1 100%);
+            font-family: 'Segoe UI', 'Roboto', 'Poppins', system-ui, sans-serif;
+            padding: 1rem;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quiz-wrapper {
+            max-width: 880px;
+            width: 100%;
+            margin: 0 auto;
+            background: #fffffff0;
+            backdrop-filter: blur(2px);
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.25);
+            padding: 1.8rem;
+            transition: all 0.2s;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 1.2rem;
+            border-bottom: 4px solid #ff8c42;
+            padding-bottom: 0.7rem;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, #1e6f9f, #e67e22);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.2px;
+        }
+
+        .sub {
+            color: #e67e22;
+            font-size: 0.85rem;
+            margin-top: 0.2rem;
+            font-weight: 600;
+        }
+
+        .progress-area {
+            background: #e6e0f0;
+            border-radius: 2rem;
+            padding: 0.5rem 1rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: #1a4a6e;
+            font-weight: 700;
+        }
+
+        .question-counter {
+            font-weight: 800;
+            background: #ffcc88;
+            padding: 0.2rem 0.8rem;
+            border-radius: 40px;
+            color: #5a3a1a;
+        }
+
+        .score-badge {
+            background: #88ccaa;
+            padding: 0.2rem 0.8rem;
+            border-radius: 40px;
+            font-weight: 700;
+            color: #1a4a2e;
+        }
+
+        /* Colores diferentes por pregunta (tonos vibrantes) */
+        .question-card {
+            background: #ffffff;
+            border-radius: 1.5rem;
+            padding: 1.3rem;
+            margin-bottom: 1.2rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+            border-left: 8px solid #ff8c42;
+            border-right: 1px solid #f0e0d0;
+            transition: border-left 0.2s;
+        }
+
+        /* Los tonos se asignarán dinámicamente con JS, pero dejamos estilos base */
+        .question-card.tono-1 { border-left-color: #FF6B6B; background: #fff5f5; }
+        .question-card.tono-2 { border-left-color: #4ECDC4; background: #f0fffe; }
+        .question-card.tono-3 { border-left-color: #FFE66D; background: #fffdf0; }
+        .question-card.tono-4 { border-left-color: #A8E6CF; background: #f4fff8; }
+        .question-card.tono-5 { border-left-color: #FFB347; background: #fff7e8; }
+        .question-card.tono-6 { border-left-color: #B980F0; background: #f9f0ff; }
+        .question-card.tono-7 { border-left-color: #FF8C94; background: #fff0f2; }
+        .question-card.tono-8 { border-left-color: #6C5B7B; background: #f4f0f8; }
+        .question-card.tono-9 { border-left-color: #F08A5D; background: #fff4e8; }
+        .question-card.tono-10 { border-left-color: #83C5BE; background: #f0faf8; }
+
+        .question-text {
+            font-size: 1.08rem;
+            font-weight: 800;
+            color: #2c3e66;
+            margin-bottom: 1.2rem;
+            line-height: 1.4;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .option {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.8rem;
+            cursor: pointer;
+            padding: 0.6rem 0.8rem;
+            border-radius: 1rem;
+            background: #fefaf5;
+            border: 2px solid #e0d0c0;
+            transition: all 0.15s;
+        }
+
+        .option:hover {
+            background: #fff4e6;
+            border-color: #ffaa66;
+            transform: scale(1.01);
+        }
+
+        input[type="radio"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 1.2rem;
+            height: 1.2rem;
+            border: 2px solid #e67e22;
+            border-radius: 50%;
+            margin-top: 0.1rem;
+            cursor: pointer;
+            background: white;
+            flex-shrink: 0;
+        }
+
+        input[type="radio"]:checked {
+            background-color: #e67e22;
+            border-color: #e67e22;
+            box-shadow: inset 0 0 0 3px white;
+        }
+
+        .option label {
+            flex: 1;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            cursor: pointer;
+            color: #2c3e66;
+            font-weight: 600;
+        }
+
+        .feedback {
+            margin-top: 0.8rem;
+            padding: 0.7rem 1rem;
+            border-radius: 1rem;
+            font-size: 0.85rem;
+            background: #fef7e8;
+            border-left: 5px solid;
+            line-height: 1.4;
+            color: #2c3e50;
+        }
+
+        .feedback.correct {
+            border-left-color: #44aa66;
+            background: #e0ffe8;
+        }
+
+        .feedback.incorrect {
+            border-left-color: #ff6666;
+            background: #ffe6e6;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            border: none;
+            background: #ddd0c0;
+            color: #4a3a2a;
+            font-weight: 800;
+            padding: 0.6rem 1.3rem;
+            border-radius: 60px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .btn-primary {
+            background: #3a86ff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2a6ad0;
+            transform: scale(1.02);
+        }
+
+        .btn-secondary {
+            background: #e67e22;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #d46a10;
+        }
+
+        .btn-reset {
+            background: #cc6644;
+            color: white;
+        }
+
+        .btn-reset:hover {
+            background: #aa4422;
+        }
+
+        .btn-success {
+            background: #44aa66;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #338855;
+        }
+
+        .results-area {
+            margin-top: 1.5rem;
+            background: #fff2e0;
+            border-radius: 1.2rem;
+            padding: 1rem;
+            border: 2px solid #ffaa33;
+            display: none;
+        }
+
+        .results-area h3 {
+            color: #cc5500;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-summary {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            font-weight: bold;
+            color: #1f4a2e;
+        }
+
+        .result-detail {
+            max-height: 280px;
+            overflow-y: auto;
+            font-size: 0.8rem;
+        }
+
+        .result-item {
+            padding: 0.4rem;
+            border-bottom: 1px solid #ffd9a0;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 0.7rem;
+            margin-top: 1.2rem;
+            color: #aa8855;
+        }
+
+        @media (max-width: 600px) {
+            .quiz-wrapper {
+                padding: 1rem;
+            }
+            .question-text {
+                font-size: 0.98rem;
+            }
+            .option label {
+                font-size: 0.88rem;
+            }
+            .btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="quiz-wrapper">
+    <div class="header">
+        <h1>🔥 Ingeniería Térmica Avanzada</h1>
+        <div class="sub">PCM, Vapor Chamber, Galinstan, refrigeración iónica, heat pipes y más</div>
+    </div>
+
+    <div class="progress-area">
+        <span class="question-counter" id="questionCounter">Pregunta 1 / 20</span>
+        <span class="score-badge" id="liveScore">✅ Aciertos: 0</span>
+    </div>
+
+    <div id="questionContainer"></div>
+
+    <div class="nav-buttons">
+        <button id="prevBtn" class="btn btn-secondary">◀ Anterior</button>
+        <button id="nextBtn" class="btn btn-primary">Siguiente ▶</button>
+        <button id="resetBtn" class="btn btn-reset">⟳ Reiniciar</button>
+        <button id="finalScoreBtn" class="btn btn-success">📊 Ver total</button>
+    </div>
+
+    <div id="resultsPanel" class="results-area"></div>
+    <footer>📌 Selecciona una opción → retroalimentación inmediata. Al finalizar, revisa tu puntuación.</footer>
+</div>
+
+<script>
+    // ==================== DATOS DEL CUESTIONARIO (20 preguntas) ====================
+    // Respuestas correctas según las justificaciones del material
+    const questionsData = [
+        { text: "En el diseño de un chasis para un servidor de alta densidad, se observa que un componente alcanza picos térmicos transitorios que superan el límite operativo. Si el espacio es suficiente pero el presupuesto es bajo, ¿por qué un Material de Cambio de Fase (PCM) de base polimérica podría ser preferible a una sal hidratada?",
+          options: ["Porque el polímero tiene una capacidad térmica latente intrínsecamente superior.", "Debido a la inestabilidad química a largo plazo y los desafíos de estabilidad de las sales hidratadas.", "Porque el polímero actúa como un disipador de aluminio tradicional pero con mayor peso.", "Porque el polímero elimina la necesidad de una matriz complementaria de alta conductividad.", "Porque las sales hidratadas solo funcionan en aplicaciones de regulación pasiva de edificios."],
+          correct: "b",
+          explanation: "Correcta (b): Las sales hidratadas tienen problemas de estabilidad química a largo plazo, lo que las hace menos fiables para ciclos repetitivos en electrónica."
+        },
+        { text: "Un sistema de refrigeración por Vapor Chamber presenta un fallo donde el 'punto caliente' no se disipa uniformemente, provocando un fallo por sobrecalentamiento localizado. ¿Cuál es el diagnóstico mecánico más probable según el ciclo de funcionamiento?",
+          options: ["Saturación del campo eléctrico en la zona de ionización.", "Obstrucción o fallo en la estructura capilar que impide el retorno del líquido condensado.", "Exceso de viscosidad en el fluido interno similar al Galinstan.", "El vapor se expande en una sola dirección (1D) en lugar de 2D.", "La temperatura de la superficie fría es igual a la del componente (equilibrio térmico)."],
+          correct: "b",
+          explanation: "Correcta (b): El funcionamiento de una Vapor Chamber depende del retorno del líquido por capilaridad; un fallo en este retorno rompe la transferencia térmica 2D."
+        },
+        { text: "Si se implementa Galinstan en un bloque de refrigeración de aluminio anodizado y se observa una degradación estructural catastrófica a las pocas semanas, ¿cuál es la causa físico-química subyacente?",
+          options: ["El Galinstan tiene una viscosidad demasiado baja para el aluminio.", "La formación de un cortocircuito por la conductividad eléctrica del metal líquido.", "El Galio reacciona con el aluminio provocando fragilización y corrosión galvánica.", "El estaño (Sn) contenido en la aleación eutéctica se solidifica a temperatura ambiente.", "La falta de un campo magnético para bombear el fluido."],
+          correct: "c",
+          explanation: "Correcta (c): El Galio es altamente reactivo con metales como el aluminio, causando fragilización y corrosión galvánica destructiva."
+        },
+        { text: "En un entorno de microgravedad (estación espacial), la refrigeración por convección natural es ineficaz. ¿Qué tecnología ofrece la solución más robusta basándose en la manipulación de fluidos sin partes móviles ni dependencia de la gravedad?",
+          options: ["Heat Pipes estándar con dependencia de gravedad para el retorno.", "Refrigeración Iónica, ya que genera un 'viento iónico' mediante campos eléctricos a nivel molecular.", "Disipadores de aluminio de gran masa.", "Sales hidratadas por su alta estabilidad química.", "Vapor Chambers orientadas verticalmente."],
+          correct: "b",
+          explanation: "Correcta (b): La refrigeración iónica crea flujo de aire forzado mediante campo eléctrico sin necesidad de gravedad o partes móviles."
+        },
+        { text: "Al comparar un Heat Pipe y una Vapor Chamber para enfriar una GPU de alta gama con un área de contacto muy pequeña y gran flujo de calor, ¿cuál es la ventaja crítica de la Vapor Chamber?",
+          options: ["Su capacidad de transportar calor a largas distancias (más de 50 cm).", "La transformación de un punto caliente de alta densidad en una superficie tibia uniforme mediante dispersión 2D.", "Un costo de implementación significativamente menor que el Heat Pipe.", "El uso de nanotubos de carbono para anular la resistencia térmica.", "Su geometría tubular que facilita la integración en portátiles delgados."],
+          correct: "b",
+          explanation: "Correcta (b): La Vapor Chamber está diseñada para eliminar puntos calientes expandiendo el calor en todas las direcciones (2D)."
+        },
+        { text: "¿Cuál es la 'Paradoja del PCM' que un ingeniero debe resolver al diseñar un sistema de gestión térmica pasiva?",
+          options: ["Tienen alta conductividad pero baja capacidad de almacenamiento.", "Poseen altísima capacidad de almacenamiento térmico, pero su conductividad térmica natural es muy limitada.", "El cambio de fase de sólido a líquido absorbe energía pero aumenta la temperatura drásticamente.", "Requieren bombas mecánicas a pesar de ser sistemas pasivos.", "Son extremadamente caros pero tienen un riesgo operativo de fuga máximo."],
+          correct: "b",
+          explanation: "Correcta (b): El PCM absorbe mucho calor latente pero tiene baja conductividad para transferirlo rápidamente."
+        },
+        { text: "En un sistema de refrigeración acústica, ¿cuál es la función específica del 'Resonador'?",
+          options: ["Generar las ondas sonoras primarias que actúan como bomba.", "Actuar como la estructura que transfiere el calor mediante compresión del gas.", "Amplificar las ondas para crear diferenciales de presión estacionarios.", "Ionizar el medio gaseoso para crear un viento iónico.", "Almacenar energía térmica mediante calor latente."],
+          correct: "c",
+          explanation: "Correcta (c): El resonador amplifica las ondas para generar los gradientes de presión necesarios para el ciclo térmico."
+        },
+        { text: "Se le pide diseñar el sistema térmico de un smartphone gaming ultra-delgado (<2mm de espacio). Según la matriz de diagnóstico, ¿por qué descartaría el Galinstan a pesar de su 'Muy Alta' conductividad?",
+          options: ["Porque su costo es bajo pero su complejidad es mínima.", "Debido al riesgo máximo de fugas/corrosión y la alta complejidad mecánica en un dispositivo de consumo masivo.", "Porque no puede dispersar el calor en 2D.", "Porque el Galinstan solo funciona en estado sólido.", "Porque requiere un transductor acústico para circular."],
+          correct: "b",
+          explanation: "Correcta (b): El riesgo de cortocircuito por fugas y la reactividad química hacen que Galinstan sea peligroso para electrónica de consumo."
+        },
+        { text: "¿Qué mejora específica aportan los Nanotubos de Carbono a la tecnología de Heat Pipes en las tendencias futuras?",
+          options: ["Permiten que el líquido se vaporice a temperaturas más bajas.", "Multiplican la capilaridad para mejorar el retorno del líquido condensado.", "Convierten el Heat Pipe en un sistema de estado sólido iónico.", "Reducen la conductividad térmica para proteger la carcasa externa.", "Permiten el uso de aluminio sin riesgo de fragilización."],
+          correct: "b",
+          explanation: "Correcta (b): El 'dopaje' con nanotubos de carbono mejora la eficiencia del ciclo capilar para un retorno más rápido."
+        },
+        { text: "Durante la transición de fase de un PCM (ej. de sólido a líquido), ¿qué ocurre con la temperatura del dispositivo que protege?",
+          options: ["Aumenta linealmente con la cantidad de calor absorbido.", "Disminuye drásticamente hasta que todo el material se funde.", "Se mantiene constante mientras dura la transición gracias al calor latente.", "Oscila debido a los diferenciales de presión estacionarios.", "Aumenta exponencialmente para romper la barrera térmica."],
+          correct: "c",
+          explanation: "Correcta (c): Los PCM absorben energía manteniendo temperatura constante durante el cambio de estado (calor latente)."
+        },
+        { text: "Un ingeniero propone usar refrigeración iónica para un sensor médico flexible. ¿Qué papel juega la IA en la optimización de esta tecnología según las tendencias actuales?",
+          options: ["Predecir fallas de corrosión galvánica en el cobre.", "Ajustar dinámicamente los campos eléctricos en tiempo real basándose en la carga de procesamiento.", "Controlar la frecuencia del transductor acústico.", "Diseñar la estructura capilar de los nanotubos de carbono.", "Reducir el costo del Galinstan mediante síntesis algorítmica."],
+          correct: "b",
+          explanation: "Correcta (b): La IA se visualiza como un controlador dinámico que optimiza el flujo iónico según la necesidad térmica instantánea."
+        },
+        { text: "En el Acto III de la gestión térmica (Refrigeración Iónica), ¿cuál es el mecanismo final que realmente mueve el calor?",
+          options: ["Una bomba mecánica de alta presión.", "Un flujo de aire forzado a nivel molecular (viento iónico) creado por el arrastre de iones.", "La expansión de vapor en una cámara sellada al vacío.", "La conducción directa a través de una aleación de Galio e Indio.", "La vibración de un resonador acústico de alta frecuencia."],
+          correct: "b",
+          explanation: "Correcta (b): El campo eléctrico arrastra iones, y este movimiento arrastra las moléculas de aire, creando flujo térmico."
+        },
+        { text: "Si un sistema de Heat Pipe falla solo cuando se coloca en una orientación específica (la zona caliente arriba y la zona fría abajo), ¿qué elemento del diseño es deficiente?",
+          options: ["El fluido interno tiene una conductividad muy baja.", "El diferencial de presión es nulo.", "La estructura capilar (mecha) no tiene la fuerza suficiente para vencer la gravedad en el retorno del líquido.", "El transductor no genera suficientes ondas sonoras.", "El material de la cubierta no es cobre puro."],
+          correct: "c",
+          explanation: "Correcta (c): Si la capilaridad es débil, el sistema se vuelve dependiente de la gravedad para funcionar."
+        },
+        { text: "¿Cuál es el objetivo principal de la 'refrigeración avanzada' más allá de simplemente enfriar?",
+          options: ["Aumentar el consumo energético de los centros de datos.", "Gestionar y redirigir la energía térmica con una resistencia mínima.", "Eliminar el uso de cobre en toda la electrónica moderna.", "Convertir todo el calor en energía sonora reutilizable.", "Mantener los dispositivos a 0 grados Celsius constantes."],
+          correct: "b",
+          explanation: "Correcta (b): El reto no es solo enfriar, sino la gestión eficiente de la energía térmica reduciendo la resistencia en el flujo."
+        },
+        { text: "¿Qué combinación de elementos forma el Galinstan y cuál es su característica física más notable en refrigeración extrema?",
+          options: ["Galio, Hierro, Estaño; es un aislante eléctrico perfecto.", "Galio, Indio, Estaño; permanece líquido a temperatura ambiente con altísima conductividad térmica.", "Cobre, Indio, Aluminio; tiene baja viscosidad y alta transparencia.", "Galio, Carbono, Silicio; se vaporiza al instante con el calor.", "Oro, Plata, Cobre; tiene costo de implementación bajo."],
+          correct: "b",
+          explanation: "Correcta (b): Galinstan es aleación eutéctica de Ga, In y Sn; líquido a temperatura ambiente con alta conductividad térmica."
+        },
+        { text: "En la 'Matriz de Diagnóstico', ¿qué tecnología presenta la menor complejidad mecánica y un riesgo operativo mínimo?",
+          options: ["Galinstan.", "Iónica.", "Vapor Chamber.", "PCM (Sólidos).", "Heat Pipe dopado con nanotubos."],
+          correct: "d",
+          explanation: "Correcta (d): Los PCM sólidos tienen complejidad mecánica baja y riesgo operativo mínimo por su naturaleza pasiva."
+        },
+        { text: "Un intercambiador de calor en un sistema de refrigeración acústica aprovecha un principio termofísico específico. ¿Cuál es?",
+          options: ["La ionización de gases nobles.", "La compresión y expansión del gas impulsado por el sonido.", "La capilaridad de nanotubos de carbono.", "La reacción galvánica controlada del Galio.", "La fusión latente de parafinas orgánicas."],
+          correct: "b",
+          explanation: "Correcta (b): La refrigeración acústica usa ondas para comprimir y expandir el gas, generando el ciclo de transferencia de calor."
+        },
+        { text: "¿Por qué la refrigeración iónica se considera la 'Frontera del Estado Sólido'?",
+          options: ["Porque utiliza bloques sólidos de aluminio para disipar.", "Porque genera flujo de aire sin partes móviles mecánicas (ventiladores).", "Porque requiere que el refrigerante esté siempre en fase sólida.", "Porque se basa en la solidificación del Galinstan.", "Porque utiliza polímeros sólidos para almacenar calor."],
+          correct: "b",
+          explanation: "Correcta (b): Logra el efecto de un ventilador mediante electrónica y campos eléctricos, eliminando desgaste mecánico."
+        },
+        { text: "El problema de la 'Electrónica Flexible' (wearables) se beneficia del uso de PCM principalmente porque:",
+          options: ["Los PCM aumentan la rigidez del dispositivo para que no se rompa.", "Permiten la integración en dispositivos plegables sin perder conductividad mediante el uso de polímeros.", "Eliminan la necesidad de baterías en los dispositivos.", "Funcionan mejor bajo la presión del cuerpo humano.", "Son los únicos que pueden usar aluminio sin corroerlo."],
+          correct: "b",
+          explanation: "Correcta (b): La tendencia integra polímeros PCM en dispositivos flexibles para gestión térmica sin comprometer ergonomía."
+        },
+        { text: "Al analizar el 'Costo de Rendimiento' del Galinstan, ¿cuál es el factor de diseño que dispara su costo de producción?",
+          options: ["La abundancia del Galio en la naturaleza.", "La necesidad de recubrimientos especiales o bloques de cobre puro para evitar la corrosión de otros metales.", "El uso de ventiladores iónicos de alta potencia.", "La necesidad de mantener el sistema a temperaturas bajo cero.", "El uso de parafinas orgánicas para sellar las fugas."],
+          correct: "b",
+          explanation: "Correcta (b): Galinstan requiere materiales compatibles como cobre puro o recubrimientos protectores debido a su agresividad química."
+        }
+    ];
+
+    let userAnswers = new Array(20).fill(null);
+    let currentIndex = 0;
+
+    const questionContainer = document.getElementById('questionContainer');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const finalScoreBtn = document.getElementById('finalScoreBtn');
+    const questionCounterSpan = document.getElementById('questionCounter');
+    const liveScoreSpan = document.getElementById('liveScore');
+    const resultsPanel = document.getElementById('resultsPanel');
+
+    // Array de tonos para cambiar por pregunta (alternar colores)
+    const tonos = ['tono-1', 'tono-2', 'tono-3', 'tono-4', 'tono-5', 'tono-6', 'tono-7', 'tono-8', 'tono-9', 'tono-10'];
+
+    function updateLiveScore() {
+        let correctCount = 0;
+        for (let i = 0; i < userAnswers.length; i++) {
+            if (userAnswers[i] && userAnswers[i] === questionsData[i].correct) correctCount++;
+        }
+        liveScoreSpan.textContent = `✅ Aciertos: ${correctCount} / 20`;
+        return correctCount;
+    }
+
+    function saveAnswer(selectedLetter) {
+        userAnswers[currentIndex] = selectedLetter;
+        updateLiveScore();
+        renderCurrentQuestion();
+    }
+
+    function renderCurrentQuestion() {
+        const q = questionsData[currentIndex];
+        const selected = userAnswers[currentIndex];
+        const letters = ['a', 'b', 'c', 'd', 'e'];
+        let optionsHtml = '';
+        q.options.forEach((opt, idx) => {
+            const letter = letters[idx];
+            const isChecked = (selected === letter);
+            optionsHtml += `
+                <div class="option" data-letter="${letter}">
+                    <input type="radio" name="question" value="${letter}" id="opt_${letter}" ${isChecked ? 'checked' : ''}>
+                    <label for="opt_${letter}"><strong>${letter.toUpperCase()})</strong> ${opt}</label>
+                </div>
+            `;
+        });
+
+        let feedbackHtml = '';
+        if (selected) {
+            const isCorrect = (selected === q.correct);
+            const correctLetter = q.correct;
+            const correctText = q.options[letters.indexOf(correctLetter)];
+            const explanation = q.explanation;
+            if (isCorrect) {
+                feedbackHtml = `<div class="feedback correct">✅ <strong>¡Correcto!</strong> ${explanation}</div>`;
+            } else {
+                feedbackHtml = `<div class="feedback incorrect">❌ <strong>Incorrecto.</strong> La respuesta correcta es ${correctLetter.toUpperCase()}) ${correctText}.<br>${explanation}</div>`;
+            }
+        } else {
+            feedbackHtml = `<div class="feedback" style="border-left-color:#ffcc88; background:#fff5e6;">⚡ Selecciona una opción para ver la retroalimentación.</div>`;
+        }
+
+        // Asignar un tono diferente según el índice de la pregunta
+        const tonoClass = tonos[currentIndex % tonos.length];
+
+        const html = `
+            <div class="question-card ${tonoClass}">
+                <div class="question-text">${q.text}</div>
+                <div class="options" id="optionsContainer">
+                    ${optionsHtml}
+                </div>
+                ${feedbackHtml}
+            </div>
+        `;
+        questionContainer.innerHTML = html;
+
+        // Event listeners
+        const optionDivs = document.querySelectorAll('.option');
+        optionDivs.forEach(div => {
+            const radio = div.querySelector('input[type="radio"]');
+            const letter = div.getAttribute('data-letter');
+            if (radio) {
+                radio.addEventListener('change', () => {
+                    if (radio.checked) saveAnswer(letter);
+                });
+            }
+            div.addEventListener('click', (e) => {
+                if (e.target.tagName !== 'INPUT') {
+                    const radioInside = div.querySelector('input');
+                    if (radioInside && !radioInside.checked) {
+                        radioInside.checked = true;
+                        saveAnswer(letter);
+                    }
+                }
+            });
+        });
+
+        questionCounterSpan.textContent = `Pregunta ${currentIndex+1} / 20`;
+    }
+
+    function showFinalResults() {
+        let correctCount = 0;
+        let detailsHtml = '';
+        for (let i = 0; i < questionsData.length; i++) {
+            const q = questionsData[i];
+            const userAns = userAnswers[i];
+            const isCorrect = (userAns === q.correct);
+            if (isCorrect) correctCount++;
+            const statusIcon = isCorrect ? '✅' : '❌';
+            const userShow = userAns ? userAns.toUpperCase() : '—';
+            const correctShow = q.correct.toUpperCase();
+            detailsHtml += `
+                <div class="result-item">
+                    <span style="min-width: 30px;">${statusIcon}</span>
+                    <span><strong>Pregunta ${i+1}</strong> (Tu respuesta: ${userShow} / Correcta: ${correctShow})</span>
+                </div>
+            `;
+        }
+        const percent = Math.round((correctCount / 20) * 100);
+        resultsPanel.innerHTML = `
+            <h3>📊 Resultado final</h3>
+            <div class="result-summary">🎯 Aciertos: ${correctCount} de 20 (${percent}%)</div>
+            <div class="result-detail">${detailsHtml}</div>
+            <button id="closeResultsBtn" class="btn btn-secondary" style="margin-top: 10px; width:100%;">✖ Cerrar resumen</button>
+        `;
+        resultsPanel.style.display = 'block';
+        document.getElementById('closeResultsBtn')?.addEventListener('click', () => {
+            resultsPanel.style.display = 'none';
+        });
+        alert(`📊 Cuestionario completado.\nAciertos: ${correctCount} de 20 (${percent}%)\nRevisa el resumen detallado en pantalla.`);
+    }
+
+    function nextQuestion() {
+        if (currentIndex < 19) {
+            currentIndex++;
+            renderCurrentQuestion();
+        } else {
+            const unanswered = userAnswers.filter(a => a === null).length;
+            if (unanswered > 0) {
+                if (confirm(`Aún tienes ${unanswered} pregunta(s) sin responder. ¿Deseas finalizar de todas formas? Las no respondidas se contarán como incorrectas.`)) {
+                    showFinalResults();
+                }
+            } else {
+                showFinalResults();
+            }
+        }
+    }
+
+    function prevQuestion() {
+        if (currentIndex > 0) {
+            currentIndex--;
+            renderCurrentQuestion();
+        } else {
+            alert("Ya estás en la primera pregunta.");
+        }
+    }
+
+    function resetQuiz() {
+        if (confirm("¿Reiniciar todo el cuestionario? Se perderán todas las respuestas.")) {
+            userAnswers = new Array(20).fill(null);
+            currentIndex = 0;
+            resultsPanel.style.display = 'none';
+            updateLiveScore();
+            renderCurrentQuestion();
+        }
+    }
+
+    prevBtn.addEventListener('click', prevQuestion);
+    nextBtn.addEventListener('click', nextQuestion);
+    resetBtn.addEventListener('click', resetQuiz);
+    finalScoreBtn.addEventListener('click', showFinalResults);
+
+    renderCurrentQuestion();
+    updateLiveScore();
+</script>
+</body>
+</html>
